@@ -1,4 +1,7 @@
 language: java
+arch:
+   - amd64
+   - ppc64le
 sudo: false
 cache:
   directories:
@@ -8,13 +11,14 @@ script:
   - mvn clean install -Pqulice --errors --batch-mode
   - mvn clean
   - pdd --source=$(pwd) --file=/dev/null
-  - est --dir=est --file=/dev/null
+  # est not supported on ppc64le. Excluding it.
+  - if [[ "$TRAVIS_CPU_ARCH" != "ppc64le" ]]; then est --dir=est --file=/dev/null; fi
 before_install:
   - rvm install 2.6.0
   - rvm use 2.6.0
 install:
   - gem install pdd -v 0.20.5
-  - gem install est -v 0.3.4
+  - if [[ "$TRAVIS_CPU_ARCH" != "ppc64le" ]]; then gem install est -v 0.3.4; fi
 env:
   global:
     - MAVEN_OPTS="-Xmx256m"
